@@ -12,7 +12,7 @@
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <vector>
 
-
+//this is just a test comment to see if my repo is set up
 class Game
 	: public DXCore
 {
