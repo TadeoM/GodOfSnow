@@ -28,6 +28,8 @@ float SpecularPhong(float3 normal, float3 lightDir, float3 toCamera, float specE
 	return pow(saturate(dot(refl, toCamera)), specExp);
 }
 
+
+
 // Struct representing the data we expect to receive from earlier pipeline stages
 // - Should match the output of our corresponding vertex shader
 // - The name of the struct itself is unimportant

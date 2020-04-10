@@ -7,6 +7,7 @@
 cbuffer ExternalData : register(b0)
 {
 	float4 colorTint;
+	float4 decalPosition;
 	matrix world;
 	matrix view;
 	matrix proj;
@@ -30,6 +31,8 @@ VertexToPixel main(VertexShaderInput input)
 	// Modify the normal so its also in world space
 	output.normal = mul((float3x3)world, input.normal);
 	output.normal = normalize(output.normal);
+	
+	float4 diff = decalPosition - float4(output.worldPos,1);
 
 	// Tints the color before passing it through
 	output.color = colorTint;

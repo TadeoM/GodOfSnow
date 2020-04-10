@@ -21,6 +21,7 @@ cbuffer externalData : register(b0)
 // Texture-related resources
 Texture2D diffuseTexture	: register(t0);
 Texture2D normalMap			: register(t1);
+Texture2D indentTexture		: register(t2);
 SamplerState samplerOptions : register(s0);
 
 
@@ -35,7 +36,6 @@ SamplerState samplerOptions : register(s0);
 // --------------------------------------------------------
 float4 main(VertexToPixelNormalMap input) : SV_TARGET
 {
-
 	// sample texture to get a color
 	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 

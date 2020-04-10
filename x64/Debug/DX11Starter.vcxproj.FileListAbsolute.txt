@@ -1,0 +1,2 @@
+C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\x64\Debug\DX11Starter.exe
+C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\x64\Debug\DX11Starter.pdb

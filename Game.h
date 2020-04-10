@@ -59,9 +59,10 @@ private:
 	float mat1Shiny;
 	float mat2Shiny;
 	float mat3Shiny;
+	DirectX::XMFLOAT4 decalPosition;
 
 	// Texture related resources
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseTexture1;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> indentTexture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseTexture2;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockDiffuse;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockNormalMap;

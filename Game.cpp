@@ -138,18 +138,19 @@ void Game::CreateBasicGeometry()
 	Mesh* mesh1 = new Mesh(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	Mesh* mesh2 = new Mesh(GetFullPathTo("../../Assets/Models/helix.obj").c_str(), device);
 	Mesh* mesh3 = new Mesh(GetFullPathTo("../../Assets/Models/torus.obj").c_str(), device);
+	Mesh* mesh4 = new Mesh(GetFullPathTo("../../Assets/Models/plane.obj").c_str(), device);
 
 	meshes.push_back(mesh1);
 	meshes.push_back(mesh2);
 	meshes.push_back(mesh3);
+	meshes.push_back(mesh4);
 
 	CreateWICTextureFromFile(
 		device.Get(),
 		context.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/clover.png").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/indent.png").c_str(),
 		nullptr,
-		diffuseTexture1.GetAddressOf());
-
+		indentTexture.GetAddressOf());
 	CreateWICTextureFromFile(
 		device.Get(),
 		context.Get(),
@@ -169,22 +170,19 @@ void Game::CreateBasicGeometry()
 		nullptr,
 		rockNormalMap.GetAddressOf());
 
-
-
 	D3D11_SAMPLER_DESC sampDesc = {};
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	sampDesc.MaxAnisotropy = 16;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	device->CreateSamplerState(&sampDesc, samplerOptions.GetAddressOf());
 
-
 	//create the materials
-	Material* mat1 = new Material(pixelShader, vertexShader, white, 64, diffuseTexture1, samplerOptions, nullptr);
-	Material* mat2 = new Material(pixelShaderNM, vertexShaderNM, white, 4, rockDiffuse, samplerOptions, rockNormalMap);
-	Material* mat3 = new Material(pixelShader, vertexShader, white, 256, diffuseTexture2, samplerOptions, nullptr);
+	Material* mat1 = new Material(pixelShader, vertexShader, white, 64, indentTexture, samplerOptions, nullptr, nullptr);
+	Material* mat2 = new Material(pixelShaderNM, vertexShaderNM, white, 4, rockDiffuse, samplerOptions, rockNormalMap, indentTexture);
+	Material* mat3 = new Material(pixelShader, vertexShader, white, 256, diffuseTexture2, samplerOptions, nullptr, nullptr);
 
 	mat1Shiny = mat1->GetShiny();
 	mat2Shiny = mat2->GetShiny();
@@ -193,19 +191,20 @@ void Game::CreateBasicGeometry()
 	materials.push_back(mat2);
 	materials.push_back(mat3);
 
+	decalPosition = XMFLOAT4(3, 3, 3, 1);
 	// Create the game entities
-	GameEntity* g1 = new GameEntity(mesh1, mat1);
-	GameEntity* g2 = new GameEntity(mesh2, mat2);
-	GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
-	GameEntity* g4 = new GameEntity(mesh3, mat3);	  // Same mesh!
-	GameEntity* g5 = new GameEntity(mesh3, mat3);	  // Same mesh!
+	GameEntity* g1 = new GameEntity(mesh4, mat2, false, decalPosition);
+	//GameEntity* g2 = new GameEntity(mesh2, mat2);
+	//GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
+	//GameEntity* g4 = new GameEntity(mesh3, mat3);	  // Same mesh!
+	//GameEntity* g5 = new GameEntity(mesh3, mat3);	  // Same mesh!
 
 	// Add to GameEntity vector (easier to loop through and clean up)
 	entities.push_back(g1);
-	entities.push_back(g2);
+	/*entities.push_back(g2);
 	entities.push_back(g3);
 	entities.push_back(g4);
-	entities.push_back(g5);
+	entities.push_back(g5);*/
 }
 
 
@@ -231,11 +230,12 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	entities[0]->GetTransform()->MoveAbsolute(.2*deltaTime, 0, 0);
-	entities[1]->GetTransform()->MoveAbsolute(.2*deltaTime, .2*deltaTime, 0);
+	//entities[0]->GetTransform()->MoveAbsolute(.2*deltaTime, 0, 0);
+	entities[0]->GetTransform()->SetPosition(0, -50, 0);
+	/*entities[1]->GetTransform()->MoveAbsolute(.2*deltaTime, .2*deltaTime, 0);
 	entities[2]->GetTransform()->MoveAbsolute(-0.2*deltaTime, -0.2*deltaTime, 0);
 	entities[3]->GetTransform()->SetRotation(0, 0, entities[3]->GetTransform()->GetPitchYawRoll().z+.5*deltaTime);
-	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);
+	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);*/
 
 	camera->Update(deltaTime, this->hWnd);
 }
@@ -258,15 +258,14 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	// fill light, moved here from init from last time
 	dLight1.AmbientColor = DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f);
-	dLight1.DiffuseColor = DirectX::XMFLOAT3(0, 0, 1);
+	dLight1.DiffuseColor = DirectX::XMFLOAT3(1,1, 1);
 	dLight1.Direction = DirectX::XMFLOAT3(1, -1, 0);
 
-	dLight2.AmbientColor = DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f);
-	dLight2.DiffuseColor = DirectX::XMFLOAT3(0, 1, 0);
+	dLight2.AmbientColor = DirectX::XMFLOAT3(1, 1, 1);
 	dLight2.Direction = DirectX::XMFLOAT3(1, 1, 0);
 
 	dLight3.AmbientColor = DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f);
-	dLight3.DiffuseColor = DirectX::XMFLOAT3(0.7f, 0, 0.3f);
+	dLight3.DiffuseColor = DirectX::XMFLOAT3(1,1,1);
 	dLight3.Direction = DirectX::XMFLOAT3(0, -1, 1);
 
 	pLight1.AmbientColor = DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f);
@@ -302,6 +301,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		if (e->GetMaterial()->GetNormalMap() != nullptr) {
 			pixelShaderNM->SetShaderResourceView("normalMap", e->GetMaterial()->GetNormalMap().Get());
 			pixelShaderNM->SetShaderResourceView("diffuseTexture", e->GetMaterial()->GetDiffuseTexture().Get());
+			pixelShaderNM->SetShaderResourceView("indentTexture", e->GetMaterial()->GetIndentTexture().Get());
 			pixelShaderNM->SetSamplerState("samplerOptions", samplerOptions.Get());
 		}
 		else {

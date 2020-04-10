@@ -10,7 +10,7 @@
 class GameEntity
 {
 public:
-	GameEntity(Mesh* mesh, Material* material);
+	GameEntity(Mesh* mesh, Material* material, bool isFloor, DirectX::XMFLOAT4 playerPos);
 
 	Mesh* GetMesh();
 	Transform* GetTransform();
@@ -19,9 +19,10 @@ public:
 	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Camera* camera);
 
 private:
-
 	Mesh* mesh;
 	Transform transform;
 	Material* material;
+	bool isFloor;
+	DirectX::XMFLOAT4 playerPosition;
 };
 
