@@ -1,1 +1,11 @@
-﻿  DX11Starter.vcxproj -> C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\x64\Debug\DX11Starter.exe
+﻿C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\NormalMapPS.hlsl(72,61-94): warning X3206: implicit truncation of vector type
+  compilation object save succeeded; see C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\x64\Debug\NormalMapPS.cso
+C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\NormalMapPS.hlsl(79,61-94): warning X3206: implicit truncation of vector type
+C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\NormalMapPS.hlsl(95,16-39): warning X3206: implicit truncation of vector type
+  
+  Game.cpp
+  GameEntity.cpp
+  Main.cpp
+  Material.cpp
+  Generating Code...
+  DX11Starter.vcxproj -> C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\x64\Debug\DX11Starter.exe

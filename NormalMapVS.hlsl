@@ -7,7 +7,7 @@
 cbuffer ExternalData : register(b0)
 {
 	float4 colorTint;
-	float4 decalPosition;
+	float4 decalPosition;	// the decal position, get the distance between the worldPos of the vertex and this value and if it's close enough, you'll be adjusting the pixel value some amount
 	matrix world;
 	matrix view;
 	matrix proj;
@@ -28,9 +28,10 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 	// Calculate the final world position of the vertex
 	output.worldPos = mul(world, float4(input.position, 1.0f)).xyz;
 
+	// this is just to test what the decal position is, and what the worldPos is
 	float4 diffInNormal = decalPosition - float4(output.worldPos, 1);
 
-	output.worldPos += diffInNormal;
+	//output.worldPos += diffInNormal;
 
 	// Modify the normal so its also in world space
 	output.normal = mul((float3x3)world, input.normal);

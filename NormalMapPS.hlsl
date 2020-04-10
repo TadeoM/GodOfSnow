@@ -21,7 +21,7 @@ cbuffer externalData : register(b0)
 // Texture-related resources
 Texture2D diffuseTexture	: register(t0);
 Texture2D normalMap			: register(t1);
-Texture2D indentTexture		: register(t2);
+Texture2D indentTexture		: register(t2);	// sample this to get a value from 0 to 1 on how to darken the given texture position - Tadeo
 SamplerState samplerOptions : register(s0);
 
 

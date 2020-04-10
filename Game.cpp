@@ -301,6 +301,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		if (e->GetMaterial()->GetNormalMap() != nullptr) {
 			pixelShaderNM->SetShaderResourceView("normalMap", e->GetMaterial()->GetNormalMap().Get());
 			pixelShaderNM->SetShaderResourceView("diffuseTexture", e->GetMaterial()->GetDiffuseTexture().Get());
+			// pass indent texture to pixel shader
 			pixelShaderNM->SetShaderResourceView("indentTexture", e->GetMaterial()->GetIndentTexture().Get());
 			pixelShaderNM->SetSamplerState("samplerOptions", samplerOptions.Get());
 		}
