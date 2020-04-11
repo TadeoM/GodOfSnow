@@ -26,7 +26,7 @@ Camera::~Camera()
 void Camera::Update(float dt, HWND windowHandle)
 {
 	// speed, 2 is hardcoded in
-	float speed = dt * 2;
+	float speed = dt * 8;
 
 	// Adjust speed if necessary based on keys...
 
