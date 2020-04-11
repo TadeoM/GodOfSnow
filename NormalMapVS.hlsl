@@ -27,9 +27,9 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 	output.color = colorTint;
 	output.uv = input.uv;
 
-	//sample the indent texture also mess with the input position, need to work on the sampling but the indenting works im pretty sure
-	float4 indent = indentTexture.SampleLevel(samplerOptions, float4(input.position.x, input.position.y, 0, 0), 0); //works to sample but im trying other things
-	input.position.y = (1.0f - indent.x) * 5.0f;
+	//sample the indent texture also mess with the input position
+	float4 indent = indentTexture.SampleLevel(samplerOptions, float4(input.uv.x, input.uv.y, 0, 0), 0);
+	input.position.y = -(1.0f - indent.x) * 5.0f; //change the 5.0 to adjust how far it will indent
 
 	// Modifying the position using the provided transformation (world) matrix
 	matrix wvp = mul(proj, mul(view, world));
@@ -49,9 +49,6 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 	output.tangent = mul((float3x3)world, input.tangent);
 	output.tangent = normalize(output.tangent);
 
-	
-
-	
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)
 	return output;

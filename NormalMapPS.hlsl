@@ -95,7 +95,7 @@ float4 main(VertexToPixelNormalMap input) : SV_TARGET
 	float3 totalLight = finalPLColor1 + pLight1.AmbientColor + (finalDirColor1);
 
 	// just the point light for now
-	return float4(totalLight * input.color * surfaceColor, 1) - (float4(indentShade, 0) * 0.4f) * input.color; // applies the darkening effect of the indent texture, the float scales it from being so harsh probably need tweaking
+	return float4(totalLight * input.color * surfaceColor, 1) - (float4(indentShade, 0) * 0.4f);// applies the darkening effect of the indent texture, the float scales it from being so harsh probably need tweaking
 
 	//just add the three values together
 	return float4(finalDirColor1 + finalDirColor2 + finalDirColor3, 1);
