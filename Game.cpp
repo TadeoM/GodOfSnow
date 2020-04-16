@@ -90,6 +90,12 @@ void Game::Init()
 
 	// Make our camera
 	camera = new Camera(0, 0, -5, this->width / (float)this->height, 25.0f);
+
+
+	//stuff for particles ----------------------
+	ParticleSetup();
+
+
 }
 
 // --------------------------------------------------------
@@ -118,9 +124,73 @@ void Game::LoadShaders()
 		device.Get(),
 		context.Get(),
 		GetFullPathTo_Wide(L"NormalMapPS.cso").c_str());
+
+	particleVS = new SimpleVertexShader(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"ParticleVS.cso").c_str());
+
+	particlePS = new SimplePixelShader(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"ParticlePS.cso").c_str());
+
 }
 
+void Game::ParticleSetup()
+{
+	// Particle setup ====================
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str(), 0, particleTexture.GetAddressOf());
 
+	// A depth state for the particles
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; // Turns off depth writing
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	device->CreateDepthStencilState(&dsDesc, particleDepthState.GetAddressOf());
+
+
+	// Blend for particles (additive)
+	D3D11_BLEND_DESC blend = {};
+	blend.AlphaToCoverageEnable = false;
+	blend.IndependentBlendEnable = false;
+	blend.RenderTarget[0].BlendEnable = true;
+	blend.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Still respect pixel shader output alpha
+	blend.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blend, particleBlendState.GetAddressOf());
+
+	// Debug rasterizer state for particles
+	D3D11_RASTERIZER_DESC rd = {};
+	rd.CullMode = D3D11_CULL_BACK;
+	rd.DepthClipEnable = true;
+	rd.FillMode = D3D11_FILL_WIREFRAME;
+	device->CreateRasterizerState(&rd, particleDebugRasterState.GetAddressOf());
+
+	// Set up particles
+	emitter = new Emitter(
+		30000,							// Max particles
+		100,							// Particles per second
+		20,								// Particle lifetime
+		0.04f,							// Start size
+		0.04f,							// End size
+		XMFLOAT4(1, 1.0f, 1.0f, 1.0f),	// Start color
+		XMFLOAT4(1, 1.0f, 1.0f, 0),		// End color
+		XMFLOAT3(0, -0.5f, 0),				// Start velocity
+		XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
+		XMFLOAT3(0, 25, 0),				// Emitter position5
+		XMFLOAT3(20.0f, 8.0f, 20.0f),		// Position randomness range
+		XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
+		XMFLOAT3(0, -0.4f, 0),				// Constant acceleration
+		device,
+		particleVS,
+		particlePS,
+		particleTexture);
+}
 
 // --------------------------------------------------------
 // Creates the geometry we're going to draw - a single triangle for now
@@ -238,6 +308,8 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);
 
 	camera->Update(deltaTime, this->hWnd);
+
+	emitter->Update(deltaTime);
 }
 
 // --------------------------------------------------------
@@ -309,6 +381,35 @@ void Game::Draw(float deltaTime, float totalTime)
 			pixelShader->SetSamplerState("samplerOptions", samplerOptions.Get());
 		}
 		e->Draw(context, camera);
+	}
+
+	// Particle drawing =============
+	{
+
+		// Particle states
+		context->OMSetBlendState(particleBlendState.Get(), 0, 0xffffffff);	// Additive blending
+		context->OMSetDepthStencilState(particleDepthState.Get(), 0);		// No depth WRITING
+
+		// No wireframe debug
+		particlePS->SetInt("debugWireframe", 0);
+		particlePS->CopyAllBufferData();
+
+		// Draw the emitter
+		emitter->Draw(context, camera);
+
+		if (GetAsyncKeyState('C'))
+		{
+			context->RSSetState(particleDebugRasterState.Get());
+			particlePS->SetInt("debugWireframe", 1);
+			particlePS->CopyAllBufferData();
+
+			emitter->Draw(context, camera);
+		}
+
+		// Reset to default states for next frame
+		context->OMSetBlendState(0, 0, 0xffffffff);
+		context->OMSetDepthStencilState(0, 0);
+		context->RSSetState(0);
 	}
 
 
