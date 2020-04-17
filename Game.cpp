@@ -89,6 +89,7 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Make our camera
+<<<<<<< HEAD
 	camera = new Camera(0, 0, -5, this->width / (float)this->height, 25.0f);
 
 
@@ -96,6 +97,9 @@ void Game::Init()
 	ParticleSetup();
 
 
+=======
+	camera = new Camera(0, 15, -25, this->width / (float)this->height, 5.0f);
+>>>>>>> Malcolm
 }
 
 // --------------------------------------------------------
@@ -240,6 +244,20 @@ void Game::CreateBasicGeometry()
 		nullptr,
 		rockNormalMap.GetAddressOf());
 
+	//load snow textures
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/snow_display.png").c_str(),
+		nullptr,
+		snowDiffuse.GetAddressOf());
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/snow_normals.jpg").c_str(),
+		nullptr,
+		snowNormal.GetAddressOf());
+
 	D3D11_SAMPLER_DESC sampDesc = {};
 	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -253,6 +271,7 @@ void Game::CreateBasicGeometry()
 	Material* mat1 = new Material(pixelShader, vertexShader, white, 64, indentTexture, samplerOptions, nullptr, nullptr);
 	Material* mat2 = new Material(pixelShaderNM, vertexShaderNM, white, 4, rockDiffuse, samplerOptions, rockNormalMap, indentTexture);
 	Material* mat3 = new Material(pixelShader, vertexShader, white, 256, diffuseTexture2, samplerOptions, nullptr, nullptr);
+	Material* snowMat = new Material(pixelShaderNM, vertexShaderNM, white, 4, snowDiffuse, samplerOptions, snowNormal, indentTexture);
 
 	mat1Shiny = mat1->GetShiny();
 	mat2Shiny = mat2->GetShiny();
@@ -260,10 +279,11 @@ void Game::CreateBasicGeometry()
 	materials.push_back(mat1);
 	materials.push_back(mat2);
 	materials.push_back(mat3);
+	materials.push_back(snowMat);
 
 	decalPosition = XMFLOAT4(3, 3, 3, 1);
 	// Create the game entities
-	GameEntity* g1 = new GameEntity(mesh4, mat2, false, decalPosition);
+	GameEntity* g1 = new GameEntity(mesh4, snowMat, false, decalPosition);
 	//GameEntity* g2 = new GameEntity(mesh2, mat2);
 	//GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
 	//GameEntity* g4 = new GameEntity(mesh3, mat3);	  // Same mesh!
@@ -373,9 +393,11 @@ void Game::Draw(float deltaTime, float totalTime)
 		if (e->GetMaterial()->GetNormalMap() != nullptr) {
 			pixelShaderNM->SetShaderResourceView("normalMap", e->GetMaterial()->GetNormalMap().Get());
 			pixelShaderNM->SetShaderResourceView("diffuseTexture", e->GetMaterial()->GetDiffuseTexture().Get());
-			// pass indent texture to pixel shader
+			// pass indent texture to pixel shader AND vertex shader
 			pixelShaderNM->SetShaderResourceView("indentTexture", e->GetMaterial()->GetIndentTexture().Get());
+			vertexShaderNM->SetShaderResourceView("indentTexture", e->GetMaterial()->GetIndentTexture().Get());
 			pixelShaderNM->SetSamplerState("samplerOptions", samplerOptions.Get());
+			vertexShaderNM->SetSamplerState("samplerOptions", samplerOptions.Get());
 		}
 		else {
 			pixelShader->SetShaderResourceView("diffuseTexture", e->GetMaterial()->GetDiffuseTexture().Get());
