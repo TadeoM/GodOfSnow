@@ -89,17 +89,11 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Make our camera
-<<<<<<< HEAD
-	camera = new Camera(0, 0, -5, this->width / (float)this->height, 25.0f);
+	camera = new Camera(0, 15, -25, this->width / (float)this->height, 5.0f);
 
 
 	//stuff for particles ----------------------
 	ParticleSetup();
-
-
-=======
-	camera = new Camera(0, 15, -25, this->width / (float)this->height, 5.0f);
->>>>>>> Malcolm
 }
 
 // --------------------------------------------------------
