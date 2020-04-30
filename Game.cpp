@@ -278,6 +278,8 @@ void Game::CreateBasicGeometry()
 	decalPosition = XMFLOAT4(3, 3, 3, 1);
 	// Create the game entities
 	GameEntity* g1 = new GameEntity(mesh4, snowMat, false, decalPosition);
+	GameEntity* g2 = new GameEntity(mesh1, mat3, false, XMFLOAT4(0, 0, 0, 1));	// player ball
+
 	//GameEntity* g2 = new GameEntity(mesh2, mat2);
 	//GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
 	//GameEntity* g4 = new GameEntity(mesh3, mat3);	  // Same mesh!
@@ -285,8 +287,9 @@ void Game::CreateBasicGeometry()
 
 	// Add to GameEntity vector (easier to loop through and clean up)
 	entities.push_back(g1);
-	/*entities.push_back(g2);
-	entities.push_back(g3);
+	entities.push_back(g2);
+
+	/*entities.push_back(g3);
 	entities.push_back(g4);
 	entities.push_back(g5);*/
 }
@@ -316,10 +319,14 @@ void Game::Update(float deltaTime, float totalTime)
 
 	//entities[0]->GetTransform()->MoveAbsolute(.2*deltaTime, 0, 0);
 	entities[0]->GetTransform()->SetPosition(0, -50, 0);
+	
 	/*entities[1]->GetTransform()->MoveAbsolute(.2*deltaTime, .2*deltaTime, 0);
 	entities[2]->GetTransform()->MoveAbsolute(-0.2*deltaTime, -0.2*deltaTime, 0);
 	entities[3]->GetTransform()->SetRotation(0, 0, entities[3]->GetTransform()->GetPitchYawRoll().z+.5*deltaTime);
 	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);*/
+
+	// Player ball movement
+	entities[1]->GetTransform()->SetPosition(0, -50, 0);
 
 	camera->Update(deltaTime, this->hWnd);
 
