@@ -12,6 +12,9 @@ GameEntity::GameEntity(Mesh* mesh, Material* material, bool isFloor, DirectX::XM
 	}
 }
 
+GameEntity::~GameEntity() {
+}
+
 Mesh* GameEntity::GetMesh() { return mesh; }
 Transform* GameEntity::GetTransform() { return &transform; }
 Material* GameEntity::GetMaterial() { return material; }

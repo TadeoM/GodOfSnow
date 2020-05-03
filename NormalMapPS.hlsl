@@ -39,6 +39,9 @@ float4 main(VertexToPixelNormalMap input) : SV_TARGET
 	// sample texture to get a color
 	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
 
+	//sample the indent texture to get a shade
+	float3 indentShade = 1.0f - indentTexture.Sample(samplerOptions, input.uv).rgb; // 1-color is so that it darkens the dark areas of the texture and not the inverse
+
 	// grab the normal map sample and unpack the normal
 	float3 unpackedNormal = normalMap.Sample(samplerOptions, input.uv).rgb * 2 - 1;
 
@@ -92,7 +95,8 @@ float4 main(VertexToPixelNormalMap input) : SV_TARGET
 	float3 totalLight = finalPLColor1 + pLight1.AmbientColor + (finalDirColor1);
 
 	// just the point light for now
-	return float4(totalLight * input.color * surfaceColor, 1);
+	return float4(totalLight * input.color * surfaceColor, 1) - (float4(indentShade, 0) * 0.4f);// applies the darkening effect of the indent texture, the float scales it from being so harsh probably need tweaking
+
 	//just add the three values together
 	return float4(finalDirColor1 + finalDirColor2 + finalDirColor3, 1);
 }

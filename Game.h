@@ -8,6 +8,8 @@
 #include "SimpleShader.h"
 #include "Lights.h"
 
+#include "Emitter.h"
+
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <vector>
@@ -33,6 +35,7 @@ private:
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders();
 	void CreateBasicGeometry();
+	void ParticleSetup();
 
 	// Vectors for things we need to clean up
 	std::vector<Mesh*> meshes;
@@ -61,11 +64,26 @@ private:
 	float mat3Shiny;
 	DirectX::XMFLOAT4 decalPosition;
 
+	//snow texture related resources
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> snowDiffuse;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> snowNormal;
+
 	// Texture related resources
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> indentTexture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseTexture2;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockDiffuse;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockNormalMap;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerOptions;
+
+
+	// Particle resources
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particleTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particleAnimatedTexture;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> particleDepthState;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> particleBlendState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> particleDebugRasterState;
+	SimpleVertexShader* particleVS;
+	SimplePixelShader* particlePS;
+	Emitter* emitter;
 };
 

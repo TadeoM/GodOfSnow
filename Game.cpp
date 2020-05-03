@@ -7,6 +7,11 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include <d3dcompiler.h>
 
+//mem leak stuff
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -33,6 +38,7 @@ Game::Game(HINSTANCE hInstance)
 	// Do we want a console window?  Probably only in debug mode
 	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 }
@@ -44,6 +50,7 @@ Game::Game(HINSTANCE hInstance)
 // --------------------------------------------------------
 Game::~Game()
 {
+	printf("zoinks");
 	// Since we've created the Mesh objects within this class (Game),
 	// this is also where we should delete them!
 	for (auto& m : meshes)
@@ -51,7 +58,7 @@ Game::~Game()
 		// Delete the current Mesh* from the meshes vector
 		delete m;
 	}
-
+	
 	// We've also created the entities here, so here is
 	// where we delete them
 	for (auto& e : entities)
@@ -64,11 +71,20 @@ Game::~Game()
 		delete f;
 	}
 
+	delete particleVS;
+	delete particlePS;
+	delete emitter;
+
 	delete camera;
+
 	delete vertexShader;
 	delete pixelShader;
+
 	delete vertexShaderNM;
 	delete pixelShaderNM;
+
+	_CrtDumpMemoryLeaks();
+	printf("heck");
 }
 
 // --------------------------------------------------------
@@ -76,7 +92,8 @@ Game::~Game()
 // are initialized but before the game loop.
 // --------------------------------------------------------
 void Game::Init()
-{	
+{
+
 	// Helper methods for loading shaders, creating some basic
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
@@ -89,7 +106,10 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Make our camera
-	camera = new Camera(0, 0, -5, this->width / (float)this->height, 25.0f);
+	camera = new Camera(0, 15, -25, this->width / (float)this->height, 5.0f);
+
+	//stuff for particles ----------------------
+	ParticleSetup();
 }
 
 // --------------------------------------------------------
@@ -118,9 +138,73 @@ void Game::LoadShaders()
 		device.Get(),
 		context.Get(),
 		GetFullPathTo_Wide(L"NormalMapPS.cso").c_str());
+
+	particleVS = new SimpleVertexShader(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"ParticleVS.cso").c_str());
+
+	particlePS = new SimplePixelShader(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"ParticlePS.cso").c_str());
+
 }
 
+void Game::ParticleSetup()
+{
+	// Particle setup ====================
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str(), 0, particleTexture.GetAddressOf());
 
+	// A depth state for the particles
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; // Turns off depth writing
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	device->CreateDepthStencilState(&dsDesc, particleDepthState.GetAddressOf());
+
+
+	// Blend for particles (additive)
+	D3D11_BLEND_DESC blend = {};
+	blend.AlphaToCoverageEnable = false;
+	blend.IndependentBlendEnable = false;
+	blend.RenderTarget[0].BlendEnable = true;
+	blend.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Still respect pixel shader output alpha
+	blend.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blend, particleBlendState.GetAddressOf());
+
+	// Debug rasterizer state for particles
+	D3D11_RASTERIZER_DESC rd = {};
+	rd.CullMode = D3D11_CULL_BACK;
+	rd.DepthClipEnable = true;
+	rd.FillMode = D3D11_FILL_WIREFRAME;
+	device->CreateRasterizerState(&rd, particleDebugRasterState.GetAddressOf());
+
+	// Set up particles
+	emitter = new Emitter(
+		30000,							// Max particles
+		100,							// Particles per second
+		20,								// Particle lifetime
+		0.04f,							// Start size
+		0.04f,							// End size
+		XMFLOAT4(1, 1.0f, 1.0f, 1.0f),	// Start color
+		XMFLOAT4(1, 1.0f, 1.0f, 0),		// End color
+		XMFLOAT3(0, -0.5f, 0),				// Start velocity
+		XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
+		XMFLOAT3(0, 25, 0),				// Emitter position5
+		XMFLOAT3(20.0f, 8.0f, 20.0f),		// Position randomness range
+		XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
+		XMFLOAT3(0, -0.4f, 0),				// Constant acceleration
+		device,
+		particleVS,
+		particlePS,
+		particleTexture);
+}
 
 // --------------------------------------------------------
 // Creates the geometry we're going to draw - a single triangle for now
@@ -170,6 +254,20 @@ void Game::CreateBasicGeometry()
 		nullptr,
 		rockNormalMap.GetAddressOf());
 
+	//load snow textures
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/snow_display.png").c_str(),
+		nullptr,
+		snowDiffuse.GetAddressOf());
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/snow_normals.jpg").c_str(),
+		nullptr,
+		snowNormal.GetAddressOf());
+
 	D3D11_SAMPLER_DESC sampDesc = {};
 	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -183,6 +281,7 @@ void Game::CreateBasicGeometry()
 	Material* mat1 = new Material(pixelShader, vertexShader, white, 64, indentTexture, samplerOptions, nullptr, nullptr);
 	Material* mat2 = new Material(pixelShaderNM, vertexShaderNM, white, 4, rockDiffuse, samplerOptions, rockNormalMap, indentTexture);
 	Material* mat3 = new Material(pixelShader, vertexShader, white, 256, diffuseTexture2, samplerOptions, nullptr, nullptr);
+	Material* snowMat = new Material(pixelShaderNM, vertexShaderNM, white, 4, snowDiffuse, samplerOptions, snowNormal, indentTexture);
 
 	mat1Shiny = mat1->GetShiny();
 	mat2Shiny = mat2->GetShiny();
@@ -190,10 +289,11 @@ void Game::CreateBasicGeometry()
 	materials.push_back(mat1);
 	materials.push_back(mat2);
 	materials.push_back(mat3);
+	materials.push_back(snowMat);
 
 	decalPosition = XMFLOAT4(3, 3, 3, 1);
 	// Create the game entities
-	GameEntity* g1 = new GameEntity(mesh4, mat2, false, decalPosition);
+	GameEntity* g1 = new GameEntity(mesh4, snowMat, false, decalPosition);
 	//GameEntity* g2 = new GameEntity(mesh2, mat2);
 	//GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
 	//GameEntity* g4 = new GameEntity(mesh3, mat3);	  // Same mesh!
@@ -238,6 +338,8 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);*/
 
 	camera->Update(deltaTime, this->hWnd);
+
+	emitter->Update(deltaTime);
 }
 
 // --------------------------------------------------------
@@ -301,15 +403,46 @@ void Game::Draw(float deltaTime, float totalTime)
 		if (e->GetMaterial()->GetNormalMap() != nullptr) {
 			pixelShaderNM->SetShaderResourceView("normalMap", e->GetMaterial()->GetNormalMap().Get());
 			pixelShaderNM->SetShaderResourceView("diffuseTexture", e->GetMaterial()->GetDiffuseTexture().Get());
-			// pass indent texture to pixel shader
+			// pass indent texture to pixel shader AND vertex shader
 			pixelShaderNM->SetShaderResourceView("indentTexture", e->GetMaterial()->GetIndentTexture().Get());
+			vertexShaderNM->SetShaderResourceView("indentTexture", e->GetMaterial()->GetIndentTexture().Get());
 			pixelShaderNM->SetSamplerState("samplerOptions", samplerOptions.Get());
+			vertexShaderNM->SetSamplerState("samplerOptions", samplerOptions.Get());
 		}
 		else {
 			pixelShader->SetShaderResourceView("diffuseTexture", e->GetMaterial()->GetDiffuseTexture().Get());
 			pixelShader->SetSamplerState("samplerOptions", samplerOptions.Get());
 		}
 		e->Draw(context, camera);
+	}
+
+	// Particle drawing =============
+	{
+
+		// Particle states
+		context->OMSetBlendState(particleBlendState.Get(), 0, 0xffffffff);	// Additive blending
+		context->OMSetDepthStencilState(particleDepthState.Get(), 0);		// No depth WRITING
+
+		// No wireframe debug
+		particlePS->SetInt("debugWireframe", 0);
+		particlePS->CopyAllBufferData();
+
+		// Draw the emitter
+		emitter->Draw(context, camera);
+
+		if (GetAsyncKeyState('C'))
+		{
+			context->RSSetState(particleDebugRasterState.Get());
+			particlePS->SetInt("debugWireframe", 1);
+			particlePS->CopyAllBufferData();
+
+			emitter->Draw(context, camera);
+		}
+
+		// Reset to default states for next frame
+		context->OMSetBlendState(0, 0, 0xffffffff);
+		context->OMSetDepthStencilState(0, 0);
+		context->RSSetState(0);
 	}
 
 
