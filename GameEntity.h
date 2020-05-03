@@ -11,7 +11,7 @@ class GameEntity
 {
 public:
 	GameEntity(Mesh* mesh, Material* material, bool isFloor, DirectX::XMFLOAT4 playerPos);
-
+	~GameEntity();
 	Mesh* GetMesh();
 	Transform* GetTransform();
 	Material* GetMaterial();

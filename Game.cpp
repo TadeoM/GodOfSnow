@@ -7,6 +7,11 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include <d3dcompiler.h>
 
+//mem leak stuff
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -33,6 +38,7 @@ Game::Game(HINSTANCE hInstance)
 	// Do we want a console window?  Probably only in debug mode
 	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 }
@@ -44,6 +50,7 @@ Game::Game(HINSTANCE hInstance)
 // --------------------------------------------------------
 Game::~Game()
 {
+	printf("zoinks");
 	// Since we've created the Mesh objects within this class (Game),
 	// this is also where we should delete them!
 	for (auto& m : meshes)
@@ -51,7 +58,7 @@ Game::~Game()
 		// Delete the current Mesh* from the meshes vector
 		delete m;
 	}
-
+	
 	// We've also created the entities here, so here is
 	// where we delete them
 	for (auto& e : entities)
@@ -64,14 +71,20 @@ Game::~Game()
 		delete f;
 	}
 
-	delete camera;
-	delete vertexShader;
-	delete pixelShader;
-	delete vertexShaderNM;
-	delete pixelShaderNM;
-	delete emitter;
 	delete particleVS;
 	delete particlePS;
+	delete emitter;
+
+	delete camera;
+
+	delete vertexShader;
+	delete pixelShader;
+
+	delete vertexShaderNM;
+	delete pixelShaderNM;
+
+	_CrtDumpMemoryLeaks();
+	printf("heck");
 }
 
 // --------------------------------------------------------
@@ -79,7 +92,8 @@ Game::~Game()
 // are initialized but before the game loop.
 // --------------------------------------------------------
 void Game::Init()
-{	
+{
+
 	// Helper methods for loading shaders, creating some basic
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
@@ -93,7 +107,6 @@ void Game::Init()
 
 	// Make our camera
 	camera = new Camera(0, 15, -25, this->width / (float)this->height, 5.0f);
-
 
 	//stuff for particles ----------------------
 	ParticleSetup();
