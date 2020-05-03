@@ -69,6 +69,9 @@ Game::~Game()
 	delete pixelShader;
 	delete vertexShaderNM;
 	delete pixelShaderNM;
+	delete emitter;
+	delete particleVS;
+	delete particlePS;
 }
 
 // --------------------------------------------------------
