@@ -3,6 +3,7 @@
 #include "DXCore.h"
 #include "Mesh.h"
 #include "GameEntity.h"
+#include "PlayerBall.h"
 #include "Camera.h"
 #include "Material.h"
 #include "SimpleShader.h"

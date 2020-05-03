@@ -1,11 +1,7 @@
-﻿C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\NormalMapPS.hlsl(72,61-94): warning X3206: implicit truncation of vector type
-  compilation object save succeeded; see C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\x64\Debug\NormalMapPS.cso
-C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\NormalMapPS.hlsl(79,61-94): warning X3206: implicit truncation of vector type
-C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\NormalMapPS.hlsl(95,16-39): warning X3206: implicit truncation of vector type
-  
-  Game.cpp
+﻿  Game.cpp
+C:\Users\Oblivione\Source\Repos\GodOfSnow\Game.cpp(331,21): error C2039: 'Update': is not a member of 'GameEntity'
   GameEntity.cpp
   Main.cpp
-  Material.cpp
+  PlayerBall.cpp
   Generating Code...
-  DX11Starter.vcxproj -> C:\Users\tmeni\OneDrive\Documents\Github\NewGodOfSnow\x64\Debug\DX11Starter.exe
+C:\Users\Oblivione\Source\Repos\GodOfSnow\GameEntity.h(10): message : see declaration of 'GameEntity'

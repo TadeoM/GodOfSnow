@@ -56,6 +56,8 @@ Game::~Game()
 	// where we delete them
 	for (auto& e : entities)
 	{
+		// ALSO NEED TO DELETE PLAYER (inherited from GameEntity class)
+
 		delete e;
 	}
 
@@ -278,7 +280,7 @@ void Game::CreateBasicGeometry()
 	decalPosition = XMFLOAT4(3, 3, 3, 1);
 	// Create the game entities
 	GameEntity* g1 = new GameEntity(mesh4, snowMat, false, decalPosition);
-	GameEntity* g2 = new GameEntity(mesh1, mat3, false, XMFLOAT4(0, 0, 0, 1));	// player ball
+	PlayerBall* p1 = new PlayerBall(mesh1, mat3, false, XMFLOAT4(0, -50, 0, 1), 5.0f);// player ball
 
 	//GameEntity* g2 = new GameEntity(mesh2, mat2);
 	//GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
@@ -287,7 +289,7 @@ void Game::CreateBasicGeometry()
 
 	// Add to GameEntity vector (easier to loop through and clean up)
 	entities.push_back(g1);
-	entities.push_back(g2);
+	entities.push_back(p1);
 
 	/*entities.push_back(g3);
 	entities.push_back(g4);
@@ -326,7 +328,7 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);*/
 
 	// Player ball movement
-	entities[1]->GetTransform()->SetPosition(0, -50, 0);
+	entities[1]->Update(deltaTime, this->hWnd);	//causing object slicing here.
 
 	camera->Update(deltaTime, this->hWnd);
 
