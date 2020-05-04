@@ -56,8 +56,6 @@ Game::~Game()
 	// where we delete them
 	for (auto& e : entities)
 	{
-		// ALSO NEED TO DELETE PLAYER (inherited from GameEntity class)
-
 		delete e;
 	}
 
@@ -66,6 +64,7 @@ Game::~Game()
 		delete f;
 	}
 
+	delete player;
 	delete camera;
 	delete vertexShader;
 	delete pixelShader;
@@ -280,7 +279,9 @@ void Game::CreateBasicGeometry()
 	decalPosition = XMFLOAT4(3, 3, 3, 1);
 	// Create the game entities
 	GameEntity* g1 = new GameEntity(mesh4, snowMat, false, decalPosition);
-	PlayerBall* p1 = new PlayerBall(mesh1, mat3, false, XMFLOAT4(0, -50, 0, 1), 5.0f);// player ball
+	player = new PlayerBall(mesh1, mat3, false, XMFLOAT4(0, -50, 0, 1), 5.0f);
+
+	//PlayerBall* p1 = new PlayerBall(mesh1, mat3, false, XMFLOAT4(0, -50, 0, 1), 5.0f);// player ball
 
 	//GameEntity* g2 = new GameEntity(mesh2, mat2);
 	//GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
@@ -289,7 +290,7 @@ void Game::CreateBasicGeometry()
 
 	// Add to GameEntity vector (easier to loop through and clean up)
 	entities.push_back(g1);
-	entities.push_back(p1);
+	//entities.push_back(player);
 
 	/*entities.push_back(g3);
 	entities.push_back(g4);
@@ -328,7 +329,8 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);*/
 
 	// Player ball movement
-	entities[1]->Update(deltaTime, this->hWnd);	//causing object slicing here.
+	//static_cast<PlayerBall*>(entities[1])->Update(deltaTime, this->hWnd);
+	player->Update(deltaTime, this->hWnd);
 
 	camera->Update(deltaTime, this->hWnd);
 
@@ -408,6 +410,13 @@ void Game::Draw(float deltaTime, float totalTime)
 		}
 		e->Draw(context, camera);
 	}
+
+	player->GetMaterial()->GetVertexShader()->SetShader();
+	player->GetMaterial()->GetPixelShader()->SetShader();
+	pixelShader->SetShaderResourceView("diffuseTexture", player->GetMaterial()->GetDiffuseTexture().Get());
+	pixelShader->SetSamplerState("samplerOptions", samplerOptions.Get());
+	player->Draw(context, camera);
+
 
 	// Particle drawing =============
 	{

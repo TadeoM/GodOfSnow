@@ -46,6 +46,8 @@ private:
 	// Our game camera
 	Camera* camera;
 
+	PlayerBall* player;
+
 
 	// Shaders and shader-related constructs
 	SimplePixelShader* pixelShader;

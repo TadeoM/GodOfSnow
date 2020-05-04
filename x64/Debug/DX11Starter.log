@@ -1,7 +1,2 @@
 ﻿  Game.cpp
-C:\Users\Oblivione\Source\Repos\GodOfSnow\Game.cpp(331,21): error C2039: 'Update': is not a member of 'GameEntity'
-  GameEntity.cpp
-  Main.cpp
-  PlayerBall.cpp
-  Generating Code...
-C:\Users\Oblivione\Source\Repos\GodOfSnow\GameEntity.h(10): message : see declaration of 'GameEntity'
+  DX11Starter.vcxproj -> C:\Users\Oblivione\Source\Repos\GodOfSnow\x64\Debug\DX11Starter.exe
