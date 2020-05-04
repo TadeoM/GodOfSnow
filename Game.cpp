@@ -106,7 +106,8 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Make our camera
-	camera = new Camera(0, -40, -50, this->width / (float)this->height, 5.0f);
+	camera = new Camera(0, -30, -50, this->width / (float)this->height, 1.0f);
+	//camera->GetTransform()->Rotate(0.4, 0, 0);
 
 	//stuff for particles ----------------------
 	ParticleSetup();
@@ -331,10 +332,15 @@ void Game::Update(float deltaTime, float totalTime)
 	//entities[0]->GetTransform()->MoveAbsolute(.2*deltaTime, 0, 0);
 	float playerSpeed = deltaTime * 10;
 	//entities[1]->GetTransform()->MoveAbsolute(0, 0, playerSpeed);
-	if (GetAsyncKeyState('I')) { entities[1]->GetTransform()->MoveAbsolute(0, 0, playerSpeed); }
-	if (GetAsyncKeyState('K')) { entities[1]->GetTransform()->MoveAbsolute(0, 0, (playerSpeed) * -1); }
-	if (GetAsyncKeyState('L')) { entities[1]->GetTransform()->MoveAbsolute(playerSpeed, 0, 0); }
-	if (GetAsyncKeyState('J')) { entities[1]->GetTransform()->MoveAbsolute((playerSpeed) * -1, 0, 0); }
+	DirectX::XMFLOAT3 pos = entities[1]->GetTransform()->GetPosition();
+	if (GetAsyncKeyState('W') && pos.z < 22) 
+	{ entities[1]->GetTransform()->MoveAbsolute(0, 0, playerSpeed); }
+	if (GetAsyncKeyState('S') && pos.z > -22)
+	{ entities[1]->GetTransform()->MoveAbsolute(0, 0, (playerSpeed) * -1); }
+	if (GetAsyncKeyState('D') && pos.x < 22)
+	{ entities[1]->GetTransform()->MoveAbsolute(playerSpeed, 0, 0); }
+	if (GetAsyncKeyState('A') && pos.x > -22)
+	{ entities[1]->GetTransform()->MoveAbsolute((playerSpeed) * -1, 0, 0); }
 	//printf("%f %f %f\n", entities[1]->GetTransform()->GetPosition().x, entities[1]->GetTransform()->GetPosition().y, entities[1]->GetTransform()->GetPosition().z);
 	//entities[1]->GetTransform()->MoveAbsolute(.2*deltaTime, .2*deltaTime, 0);
 	/*entities[2]->GetTransform()->MoveAbsolute(-0.2*deltaTime, -0.2*deltaTime, 0);

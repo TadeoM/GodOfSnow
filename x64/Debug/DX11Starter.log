@@ -1,3 +1,8 @@
-﻿  Game.cpp
-  LINK : C:\Users\tmeni\OneDrive\Documents\Github\GodOfSnow\x64\Debug\DX11Starter.exe not found or not built by the last incremental link; performing full link
+﻿C:\Users\tmeni\OneDrive\Documents\Github\GodOfSnow\NormalMapVS.hlsl(65,11-38): warning X3206: implicit truncation of vector type
+  
+  compilation object save succeeded; see C:\Users\tmeni\OneDrive\Documents\Github\GodOfSnow\x64\Debug\NormalMapVS.cso
+  Game.cpp
+  GameEntity.cpp
+  Main.cpp
+  Generating Code...
   DX11Starter.vcxproj -> C:\Users\tmeni\OneDrive\Documents\Github\GodOfSnow\x64\Debug\DX11Starter.exe

@@ -23,7 +23,7 @@ private:
 	Mesh* mesh;
 	Transform transform;
 	Material* material;
-	DirectX::XMFLOAT4 playPosHistory[10];
+	DirectX::XMFLOAT4 playPosHistory[50];
 	bool isFloor;
 	DirectX::XMFLOAT3 playerPosition;
 };

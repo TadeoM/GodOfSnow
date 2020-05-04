@@ -31,12 +31,12 @@ void Camera::Update(float dt, HWND windowHandle)
 	// Adjust speed if necessary based on keys...
 
 	// Basic movement
-	if (GetAsyncKeyState('W') & 0x8000) { transform.MoveRelative(0, 0, speed); }
+	/*if (GetAsyncKeyState('W') & 0x8000) { transform.MoveRelative(0, 0, speed); }
 	if (GetAsyncKeyState('S') & 0x8000) { transform.MoveRelative(0, 0, (speed) * -1); }
 	if (GetAsyncKeyState('D') & 0x8000) { transform.MoveRelative(speed, 0, 0); }
 	if (GetAsyncKeyState('A') & 0x8000) { transform.MoveRelative((speed) * -1, 0, 0); }
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000) { transform.MoveRelative(0, speed, 0); }
-	if (GetAsyncKeyState('X') & 0x8000) { transform.MoveRelative(0, (speed) * -1, 0); }
+	if (GetAsyncKeyState('X') & 0x8000) { transform.MoveRelative(0, (speed) * -1, 0); }*/
 
 	// Mouse look...
 

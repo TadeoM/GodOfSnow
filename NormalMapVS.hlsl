@@ -10,8 +10,9 @@ cbuffer ExternalData : register(b0)
 	matrix world;
 	matrix view;
 	matrix proj;
-	//float4 decalHistory[10];
+	float4 decalHistory[50];
 	float3 decalPosition;
+	int decalCount;
 	int isFloor;
 }
 
@@ -54,14 +55,14 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 		decalPos2D.y = 0;
 		float distanceTest = distance(worldPos2D, decalPos2D);
 
-		if (distanceTest < radius && outputHeightChangeVal < radius - distanceTest) {
-			outputColorChangeVal = ((radius - distanceTest) / radius) * .8;
-			//outputColorChangeVal = 1;
-			outputHeightChangeVal = radius - distanceTest;
-		}
-		/*for (int i = 0; i < 10; i++) {
+		//if (distanceTest < radius && outputHeightChangeVal < radius - distanceTest) {
+		//	outputColorChangeVal = ((radius - distanceTest) / radius) * .8;
+		//	//outputColorChangeVal = 1;
+		//	outputHeightChangeVal = radius - distanceTest;
+		//}
+		for (int i = 0; i < 49; i++) {
 
-			float3 decalPos2D = decalPosition;
+			float3 decalPos2D = decalHistory[i];
 			decalPos2D.y = 0;
 			float distanceTest = distance(worldPos2D, decalPos2D);
 
@@ -70,7 +71,7 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 				//outputColorChangeVal = 1;
 				outputHeightChangeVal = radius - distanceTest;
 			}
-		}*/
+		}
 		output.color -= outputColorChangeVal;
 		output.position.y -= outputHeightChangeVal;
 	}
