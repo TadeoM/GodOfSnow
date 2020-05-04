@@ -50,7 +50,16 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 
 		float outputHeightChangeVal = 0;
 		float outputColorChangeVal = 0;
-		for (int i = 0; i < 10; i++) {
+		float3 decalPos2D = decalPosition;
+		decalPos2D.y = 0;
+		float distanceTest = distance(worldPos2D, decalPos2D);
+
+		if (distanceTest < radius && outputHeightChangeVal < radius - distanceTest) {
+			outputColorChangeVal = ((radius - distanceTest) / radius) * .8;
+			//outputColorChangeVal = 1;
+			outputHeightChangeVal = radius - distanceTest;
+		}
+		/*for (int i = 0; i < 10; i++) {
 
 			float3 decalPos2D = decalPosition;
 			decalPos2D.y = 0;
@@ -61,7 +70,7 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 				//outputColorChangeVal = 1;
 				outputHeightChangeVal = radius - distanceTest;
 			}
-		}
+		}*/
 		output.color -= outputColorChangeVal;
 		output.position.y -= outputHeightChangeVal;
 	}
