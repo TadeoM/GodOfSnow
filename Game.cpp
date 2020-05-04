@@ -106,7 +106,7 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Make our camera
-	camera = new Camera(0, 15, -25, this->width / (float)this->height, 5.0f);
+	camera = new Camera(0, -40, -50, this->width / (float)this->height, 5.0f);
 
 	//stuff for particles ----------------------
 	ParticleSetup();
@@ -196,7 +196,7 @@ void Game::ParticleSetup()
 		XMFLOAT4(1, 1.0f, 1.0f, 0),		// End color
 		XMFLOAT3(0, -0.5f, 0),				// Start velocity
 		XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
-		XMFLOAT3(0, 25, 0),				// Emitter position5
+		XMFLOAT3(0, -36, 0),				// Emitter position5
 		XMFLOAT3(20.0f, 8.0f, 20.0f),		// Position randomness range
 		XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
 		XMFLOAT3(0, -0.4f, 0),				// Constant acceleration
