@@ -62,7 +62,7 @@ private:
 	float mat1Shiny;
 	float mat2Shiny;
 	float mat3Shiny;
-	DirectX::XMFLOAT4 decalPosition;
+	DirectX::XMFLOAT3 decalPosition;
 
 	//snow texture related resources
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> snowDiffuse;

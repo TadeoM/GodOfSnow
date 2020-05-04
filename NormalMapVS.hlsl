@@ -7,10 +7,12 @@
 cbuffer ExternalData : register(b0)
 {
 	float4 colorTint;
-	float4 decalPosition;	// the decal position, get the distance between the worldPos of the vertex and this value and if it's close enough, you'll be adjusting the pixel value some amount
 	matrix world;
 	matrix view;
 	matrix proj;
+	//float4 decalHistory[10];
+	float3 decalPosition;
+	int isFloor;
 }
 
 Texture2D indentTexture		: register(t2); //indent texture for sampling, register(t2) because its the same as it is in the PS
@@ -28,8 +30,10 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 	output.uv = input.uv;
 
 	//sample the indent texture also mess with the input position
-	float4 indent = indentTexture.SampleLevel(samplerOptions, float4(input.uv.x, input.uv.y, 0, 0), 0);
-	input.position.y = -(1.0f - indent.x) * 5.0f; //change the 5.0 to adjust how far it will indent
+	//float4 indent = indentTexture.SampleLevel(samplerOptions, float4(input.uv.x, input.uv.y, 0, 0), 0);
+	
+	//indent = float4()
+	//input.position.y = -(1.0f - indent.x) * 5.0f; //change the 5.0 to adjust how far it will indent
 
 	// Modifying the position using the provided transformation (world) matrix
 	matrix wvp = mul(proj, mul(view, world));
@@ -37,9 +41,39 @@ VertexToPixelNormalMap main(VertexShaderInput input)
 
 	// Calculate the final world position of the vertex
 	output.worldPos = mul(world, float4(input.position, 1.0f)).xyz;
+	if (isFloor == 1) {
+		// get world and decal positions and change their y values
+		float3 worldPos2D = output.worldPos;
+		worldPos2D.y = 0;
 
-	// this is just to test what the decal position is, and what the worldPos is
-	float4 diffInNormal = decalPosition - float4(output.worldPos, 1);
+		float radius = 3;
+
+		float outputHeightChangeVal = 0;
+		float outputColorChangeVal = 0;
+		float3 decalPos2D = decalPosition;
+		decalPos2D.y = 0;
+		float distanceTest = distance(worldPos2D, decalPos2D);
+
+		if (distanceTest < radius && outputHeightChangeVal < radius - distanceTest) {
+			outputColorChangeVal = ((radius - distanceTest) / radius) * .8;
+			//outputColorChangeVal = 1;
+			outputHeightChangeVal = radius - distanceTest;
+		}
+		/*for (int i = 0; i < 10; i++) {
+
+			float3 decalPos2D = decalPosition;
+			decalPos2D.y = 0;
+			float distanceTest = distance(worldPos2D, decalPos2D);
+
+			if (distanceTest < radius && outputHeightChangeVal < radius - distanceTest) {
+				outputColorChangeVal = ((radius - distanceTest) / radius) * .8;
+				//outputColorChangeVal = 1;
+				outputHeightChangeVal = radius - distanceTest;
+			}
+		}*/
+		output.color -= outputColorChangeVal;
+		output.position.y -= outputHeightChangeVal;
+	}
 
 	// Modify the normal so its also in world space
 	output.normal = mul((float3x3)world, input.normal);
