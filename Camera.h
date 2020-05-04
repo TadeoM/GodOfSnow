@@ -26,8 +26,8 @@ private:
 	DirectX::XMFLOAT4X4 viewMatrix;
 	DirectX::XMFLOAT4X4 projMatrix;
 
-	float mouseLookSpeed;
-	POINT prevMousePosition;
+	/*float mouseLookSpeed;
+	POINT prevMousePosition;*/
 	Transform transform;
 
 };

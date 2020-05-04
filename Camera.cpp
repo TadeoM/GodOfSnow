@@ -7,7 +7,7 @@ using namespace DirectX;
 Camera::Camera(float x, float y, float z, float aspectRatio, float mouseLookSpeed)
 {
 	// Save speed and pos
-	this->mouseLookSpeed = mouseLookSpeed;
+	//this->mouseLookSpeed = mouseLookSpeed;
 	transform.SetPosition(x, y, z);
 
 	// Update our view & proj
@@ -31,7 +31,7 @@ void Camera::Update(float dt, HWND windowHandle)
 	// Adjust speed if necessary based on keys...
 
 	// Basic movement
-	if (GetAsyncKeyState('W') & 0x8000) { transform.MoveRelative(0, 0, speed); }
+	//if (GetAsyncKeyState('W') & 0x8000) { transform.MoveRelative(0, 0, speed); }
 	/*if (GetAsyncKeyState('S') & 0x8000) { transform.MoveRelative(0, 0, (speed) * -1); }
 	if (GetAsyncKeyState('D') & 0x8000) { transform.MoveRelative(speed, 0, 0); }
 	if (GetAsyncKeyState('A') & 0x8000) { transform.MoveRelative((speed) * -1, 0, 0); }
@@ -40,19 +40,19 @@ void Camera::Update(float dt, HWND windowHandle)
 
 	// Mouse look...
 
-	POINT mousePos = {};
-	GetCursorPos(&mousePos);
-	ScreenToClient(windowHandle, &mousePos);
-	float rotSpeed = dt * mouseLookSpeed;
-	//rotate while lmb is down
-	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) 
-	{ 
-		float x = (mousePos.x - prevMousePosition.x) * rotSpeed;
-		float y = (mousePos.y - prevMousePosition.y) * rotSpeed;
+	//POINT mousePos = {};
+	//GetCursorPos(&mousePos);
+	//ScreenToClient(windowHandle, &mousePos);
+	//float rotSpeed = dt * mouseLookSpeed;
+	////rotate while lmb is down
+	//if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) 
+	//{ 
+	//	float x = (mousePos.x - prevMousePosition.x) * rotSpeed;
+	//	float y = (mousePos.y - prevMousePosition.y) * rotSpeed;
 
-		transform.Rotate(y, x, 0);
-	}
-	prevMousePosition = mousePos;
+	//	transform.Rotate(y, x, 0);
+	//}
+	//prevMousePosition = mousePos;
 	// Every frame, update the view matrix
 	UpdateViewMatrix();
 }
@@ -66,7 +66,7 @@ void Camera::UpdateViewMatrix()
 	XMVECTOR rotQuat = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&rotation));
 
 	// Define the "standard" forward vector w/o rotation (0,0,1)
-	XMVECTOR basicForward = XMVectorSet(0, 0, 1, 0);
+	XMVECTOR basicForward = XMVectorSet(0, -1, 0, 0);	//<- birds-eye view	"forward"	//(0, 0, 1, 0);
 
 	// Rotate the "standard forward" by OUR rotation
 	XMVECTOR ourForward = XMVector3Rotate(basicForward, rotQuat);
@@ -75,7 +75,7 @@ void Camera::UpdateViewMatrix()
 	XMMATRIX view = XMMatrixLookToLH(
 		XMLoadFloat3(&transform.GetPosition()),
 		ourForward,
-		XMVectorSet(0, 1, 0, 0));
+		XMVectorSet(0, 0, 1, 0));		 //<- birds-eye view "up"					//(0, 1, 0, 0));
 	XMStoreFloat4x4(&viewMatrix, view);
 }
 

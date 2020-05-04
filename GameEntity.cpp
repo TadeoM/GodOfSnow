@@ -16,7 +16,6 @@ Mesh* GameEntity::GetMesh() { return mesh; }
 Transform* GameEntity::GetTransform() { return &transform; }
 Material* GameEntity::GetMaterial() { return material; }
 
-
 void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Camera* camera)
 {
 	SimpleVertexShader* vs = material->GetVertexShader();

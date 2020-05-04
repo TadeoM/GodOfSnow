@@ -3,7 +3,7 @@
 #include "DXCore.h"
 #include "Mesh.h"
 #include "GameEntity.h"
-#include "PlayerBall.h"
+//#include "PlayerBall.h"
 #include "Camera.h"
 #include "Material.h"
 #include "SimpleShader.h"
@@ -46,7 +46,7 @@ private:
 	// Our game camera
 	Camera* camera;
 
-	PlayerBall* player;
+	//PlayerBall* player;
 
 
 	// Shaders and shader-related constructs

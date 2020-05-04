@@ -64,7 +64,6 @@ Game::~Game()
 		delete f;
 	}
 
-	delete player;
 	delete camera;
 	delete vertexShader;
 	delete pixelShader;
@@ -90,7 +89,7 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Make our camera
-	camera = new Camera(0, 15, -25, this->width / (float)this->height, 5.0f);
+	camera = new Camera(0, 20, 0, this->width / (float)this->height, 5.0f);
 
 
 	//stuff for particles ----------------------
@@ -279,9 +278,8 @@ void Game::CreateBasicGeometry()
 	decalPosition = XMFLOAT4(3, 3, 3, 1);
 	// Create the game entities
 	GameEntity* g1 = new GameEntity(mesh4, snowMat, false, decalPosition);
-	player = new PlayerBall(mesh1, mat3, false, XMFLOAT4(0, -50, 0, 1), 5.0f);
 
-	//PlayerBall* p1 = new PlayerBall(mesh1, mat3, false, XMFLOAT4(0, -50, 0, 1), 5.0f);// player ball
+	GameEntity* g2 = new GameEntity(mesh1, mat3, false, XMFLOAT4(0, -50, 0, 1));// player ball
 
 	//GameEntity* g2 = new GameEntity(mesh2, mat2);
 	//GameEntity* g3 = new GameEntity(mesh3, mat3);	  // Same mesh!
@@ -290,7 +288,7 @@ void Game::CreateBasicGeometry()
 
 	// Add to GameEntity vector (easier to loop through and clean up)
 	entities.push_back(g1);
-	//entities.push_back(player);
+	entities.push_back(g2);
 
 	/*entities.push_back(g3);
 	entities.push_back(g4);
@@ -329,10 +327,13 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[4]->GetTransform()->SetRotation(0, 0, entities[4]->GetTransform()->GetPitchYawRoll().z + -.5 * deltaTime);*/
 
 	// Player ball movement
-	//static_cast<PlayerBall*>(entities[1])->Update(deltaTime, this->hWnd);
-	player->Update(deltaTime, this->hWnd);
+	float speed = deltaTime * 8;
+	if (GetAsyncKeyState('W') & 0x8000) { entities[1]->GetTransform()->MoveAbsolute(0, 0, speed); }
+	if (GetAsyncKeyState('S') & 0x8000) { entities[1]->GetTransform()->MoveAbsolute(0, 0, (speed) * -1); }
+	if (GetAsyncKeyState('D') & 0x8000) { entities[1]->GetTransform()->MoveAbsolute(speed, 0, 0); }
+	if (GetAsyncKeyState('A') & 0x8000) { entities[1]->GetTransform()->MoveAbsolute((speed) * -1, 0, 0); }
 
-	camera->Update(deltaTime, this->hWnd);
+	//camera->Update(deltaTime, this->hWnd);
 
 	emitter->Update(deltaTime);
 }
@@ -411,11 +412,11 @@ void Game::Draw(float deltaTime, float totalTime)
 		e->Draw(context, camera);
 	}
 
-	player->GetMaterial()->GetVertexShader()->SetShader();
+	/*player->GetMaterial()->GetVertexShader()->SetShader();
 	player->GetMaterial()->GetPixelShader()->SetShader();
 	pixelShader->SetShaderResourceView("diffuseTexture", player->GetMaterial()->GetDiffuseTexture().Get());
 	pixelShader->SetSamplerState("samplerOptions", samplerOptions.Get());
-	player->Draw(context, camera);
+	player->Draw(context, camera);*/
 
 
 	// Particle drawing =============
